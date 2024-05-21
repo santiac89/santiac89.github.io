@@ -1,0 +1,709 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Creating a PICO-8 game</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+iframe {
+	width: 100%;
+	height: 800px;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="eea0a658-cbe9-4310-a5fc-ac004dc44e0e" class="page sans"><header><h1 class="page-title">Creating a PICO-8 game</h1><p class="page-description"></p></header><div class="page-body"><p id="b5ccfb7a-016a-413a-bb4e-6a7e60f856c9" class="">
+</p><p id="5b4f9e13-5063-4506-98cd-2daa207c258b" class="">I recently discovered this awesome fantasy console with a lot of beautiful but tiny games and I believe it is a great starting point for someone who is starting to code and want to focus on developing games. </p><p id="bc959734-1f9c-4947-84a8-cdb0a5b5825b" class="">
+</p><p id="444083a6-05f8-4778-892d-5f1b375977fd" class="">The PICO-8 is a tiny environment with the following specs:</p><p id="edeed325-a40c-4739-98e4-47ad2359e3e2" class="">
+</p><ul id="56081005-9343-447e-aef3-941df092211f" class="bulleted-list"><li style="list-style-type:disc">Display<ul id="3b0dde0b-af0e-43c0-9fda-6ecf2d1cda6a" class="bulleted-list"><li style="list-style-type:circle">128 x 128 pixel resolution</li></ul><ul id="502fb90c-a98d-41e8-b937-10e3f4f6ba7b" class="bulleted-list"><li style="list-style-type:circle">16 colors</li></ul></li></ul><ul id="dfb86eab-2842-402c-a814-57c9c5acfd8d" class="bulleted-list"><li style="list-style-type:disc">Sound<ul id="aa86a138-9001-4f34-847f-ea4ae12bccd3" class="bulleted-list"><li style="list-style-type:circle">4 channels</li></ul><ul id="cfc10219-88c9-421d-9147-a97bbc9f7422" class="bulleted-list"><li style="list-style-type:circle">8 waveforms</li></ul></li></ul><ul id="e9f7b296-70a1-4bac-b417-8154c60489ac" class="bulleted-list"><li style="list-style-type:disc">Controls<ul id="e21c346d-4ae0-4d79-a784-1b58339ef45a" class="bulleted-list"><li style="list-style-type:circle">two 6-button controllers (up, down, left, right, x, o) available from a PC keyboard</li></ul><ul id="62c52654-ebbc-4679-8869-0af992dc2f8b" class="bulleted-list"><li style="list-style-type:circle">connect up to eight 6-button controllers via SDL</li></ul></li></ul><ul id="1b067776-bcbd-4b16-ac73-2a4bad29eb33" class="bulleted-list"><li style="list-style-type:disc">Cartridge size<ul id="48648f6a-503d-40a6-be72-eb46f94362a9" class="bulleted-list"><li style="list-style-type:circle">32 kilobytes per cartridge</li></ul><ul id="ec0433e0-aeba-4b37-a44c-6f1ad3a9c3f4" class="bulleted-list"><li style="list-style-type:circle">128 x 128 pixel sprite sheet</li></ul><ul id="3acaba4b-6fea-4273-8ff6-64631c77a70d" class="bulleted-list"><li style="list-style-type:circle">128 x 32 tile map</li></ul><ul id="b112bc96-02f4-4a52-95e4-dcffe096b6f0" class="bulleted-list"><li style="list-style-type:circle">64 sound patterns, 64 music patterns</li></ul><ul id="1c83c0c9-65e2-4ba3-b57d-fb70092787d8" class="bulleted-list"><li style="list-style-type:circle">Lua code space limited by characters and tokens</li></ul></li></ul><ul id="679531ad-f7a7-4108-87f8-3b8261160d5c" class="bulleted-list"><li style="list-style-type:disc">Memory<ul id="e3674b1c-1e02-4275-970b-e564a6f89dec" class="bulleted-list"><li style="list-style-type:circle">addressable memory regions for graphics, sound, and general use</li></ul><ul id="ad528dcf-c91b-4045-bb7f-0ba76e5d37a7" class="bulleted-list"><li style="list-style-type:circle">separate RAM for the Lua call stack</li></ul><ul id="f894c16a-1488-4a4c-9a69-57a0be9e96ef" class="bulleted-list"><li style="list-style-type:circle">64 values (256 bytes) persistent memory per cart</li></ul><ul id="53495a4e-2c61-484a-973b-43500d6ec745" class="bulleted-list"><li style="list-style-type:circle">Raspberry Pi GPIO pins mapped to memory</li></ul></li></ul><p id="ae86c1c3-f74d-411a-96cb-0b5c47ea636b" class="">
+</p><p id="bdf17436-3669-40cb-ba19-b982ddd5a4d6" class="">The PICO-8 also includes a development environment complete with code, sprite, sounds, music and map editors!</p><p id="b4df066f-6c35-4b95-a7ea-aa436af20a81" class="">
+</p><p id="99e317c4-55ae-4655-ad92-854842926707" class="">Because of the specs, there is a lot of constraints being set. I found this useful for keeping focus on developing something from end-to-end instead of trying to build something huge where you get lost in configurations, compilers, libraries and so on. In simpler terms, you have to work with what is given to you and nothing else. </p><p id="23a6504d-782d-42df-8f64-f9ddf9242ffc" class="">These constraints can also boost the creativity of developers by forcing them to think out-of-the-box for alternatives ways of doing something.</p><p id="deff85af-1c3d-4a33-97ba-7cbde00bea43" class="">
+</p><p id="28342fd8-5594-4b61-8d36-f5483a93f4a1" class="">I’m 35 and I started programming as a hobby when I was 13, I then took it as a professional career but never immersed myself in videogames development, even being a huge fan of them. I also have a tendency to think of an idea for a game, start working on it and realize is too big for me to handle and leave it in the middle, so this is a great opportunity for developing something small.</p><p id="2e2011a5-e72b-4dae-9074-5d088107c0f6" class="">
+</p><p id="69496003-943b-4c7f-a6af-43f61325e8a7" class="">This is the context where the idea for “Face of Mars” came. A top-down shooter game where you have to defeat a lot of enemies, kind of a bullet-hell game, until the end where you have to battle against the Face Of Mars. </p><figure id="eb6fa798-679e-4842-8a7b-8044121f43bb" class="image"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled.png"><img style="width:132px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled.png"/></a><figcaption>The player’s ship</figcaption></figure><p id="20b10e99-4c8b-4cb2-99e7-5a3e170de52e" class="">
+</p><p id="095a9cbc-ce77-47a2-8dba-da7e7cf6726f" class="">The idea came from an episode of the X-Files where some astronauts are being tormented by some entity emerging from the alleged face of Mars.</p><p id="504c25c7-2e04-4907-9917-84f3d50d86e7" class="">
+</p><figure id="669ad3a8-9604-4aed-8296-82993de3c32b" class="image"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%201.png"><img style="width:233.99038696289062px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%201.png"/></a><figcaption>The Face of Mars, picture from 1976. Nowadays with higher quality pictures we have discovered that it does not resemble a face at all.</figcaption></figure><p id="b6a1ff4e-30d6-4adb-b75e-b6d8f8299a80" class="">
+</p><p id="7e66b42d-d42e-4024-9b73-0600bdf355e2" class="">Naturally, due to my anxiety, I started at the end: the actual boss battle against the face of Mars. I took the image you see above and started drawing on top of it, adding some details, etc. This is my first sketch of it:</p><p id="98a8b1d5-bbee-4790-bde1-6fbbf46dc5c5" class="">
+</p><figure id="7291c0fd-d69b-498b-a20c-6a4502446a32" class="image"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%202.png"><img style="width:240px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%202.png"/></a></figure><p id="2640e00e-a509-4730-bd06-f764ee9f875b" class="">
+</p><p id="329fa8c4-4e19-4c80-9f5a-b37287a2fa1b" class="">I was unable to use this image of course because of the PICO-8 restrictions, but it was good to have an idea of what I wanted the boss to look like.</p><p id="aead04da-c8f7-4593-9a77-cadfa71ce2fd" class="">
+</p><p id="c32cad99-db6f-4bfa-b3c5-c310be82a73a" class="">I wrote down also how this boss will behave, how it will attack, etc. Some of the attacks I thought of:</p><ul id="238f9808-e438-46f9-ab1e-03b2633d6fbc" class="bulleted-list"><li style="list-style-type:disc">Shooting bullets from the mouth.</li></ul><ul id="8174e97a-6195-4923-92b3-6de700b24471" class="bulleted-list"><li style="list-style-type:disc">Shooting lasers from its eyes.</li></ul><ul id="43475bf4-3fbe-4c46-9010-03dfabeb7a6f" class="bulleted-list"><li style="list-style-type:disc">Invoke Mars’ moons, Phobos and Deimos, and spawn enemies from them.</li></ul><ul id="e35a5907-6730-475b-a983-496b90eea4b1" class="bulleted-list"><li style="list-style-type:disc">Invoke Mars’ moons, Phobos and Deimos, and make them collide to crush your ship.</li></ul><ul id="de4f0526-ea34-4d0d-b882-08d1a869277e" class="bulleted-list"><li style="list-style-type:disc">Grow some arms with hands that crush your ship</li></ul><p id="85c13766-d7c6-4fca-bd9f-7e5d815ed4ba" class="">
+</p><p id="5f494e57-10a4-4120-af7f-64b1eba15d0e" class="">Ideas 3, 4 and 5 were discarded since I wanted to keep it small, but I added also some movements attack that I called Sniping (Go fast to the position of the ship) and Loop (Move in a loop from the edges to the center and when there shoot a spread of bullets).</p><p id="d4d589fd-6aa9-422b-befa-9b73e3795ca0" class="">
+</p><p id="db9a20fd-075a-4b89-94f2-be0b52a503d8" class="">Here is what the boss looks like so far:</p><p id="57abe028-2e32-419f-bc46-84df1727c448" class="">
+</p><figure id="c9f51302-5f0e-4955-ba7c-46061bb3fdf5" class="image"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%203.png"><img style="width:250px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%203.png"/></a><figcaption>The Face Of Mars final boss</figcaption></figure><p id="272b0474-9953-4beb-88d3-31ef8de45d33" class="">
+</p><p id="fd7954f4-409a-4816-b6c8-0b755ad08ce6" class="">After having the boss defined, it was time to define some other enemies and how the gameplay will be. I decided the following for the general gameplay: </p><ul id="50c00629-7445-4cb6-84b6-60f91da13651" class="bulleted-list"><li style="list-style-type:disc">There will be waves of enemies, each one being harder than the last.</li></ul><ul id="56a6cec0-0328-442b-98e2-8340d4a6e0ba" class="bulleted-list"><li style="list-style-type:disc">The player will have a Dash movement.<ul id="b3a73c25-c2e0-4fbb-915d-c5eb0d09d73f" class="bulleted-list"><li style="list-style-type:circle">It kills enemies</li></ul><ul id="0f32ce5b-9a8e-44ab-81a2-99b5dccefdc7" class="bulleted-list"><li style="list-style-type:circle">It charges your secondary weapon on each kill.</li></ul><ul id="e63e6357-7886-4682-b641-9238849f1c71" class="bulleted-list"><li style="list-style-type:circle"></li></ul></li></ul><ul id="fcfd929b-b634-4cdd-bfc7-72cc98a4fd8a" class="bulleted-list"><li style="list-style-type:disc">There is going to be a Secondary Weapon, selectable by enemy drops between one of two possibilities:<ul id="7319c192-68bd-49b4-98fe-edf08ce66137" class="bulleted-list"><li style="list-style-type:circle">A nuke bomb that damages everything in the screen.</li></ul><ul id="20894514-2963-4f11-b7ab-6c1569ef6646" class="bulleted-list"><li style="list-style-type:circle">A blue laser constantly firing forward for a few seconds.<figure id="3090cd42-5fc3-4a8a-91f5-2ce1819ac9e9" class="image" style="text-align:center"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%204.png"><img style="width:240px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%204.png"/></a><figcaption>The laser and nuke secondary weapon selectors respectively</figcaption></figure></li></ul><p id="1a44798b-7f05-4a55-92d2-c6452e977057" class="">
+</p></li></ul><ul id="a3a0b992-d512-4e05-b29e-3ec2f2fb35f5" class="bulleted-list"><li style="list-style-type:disc">The ship will have upgrades that are going to be randomly dropped by enemies. <ul id="b182766a-43b7-4355-bd47-41aa829c24ac" class="bulleted-list"><li style="list-style-type:circle">There is a max of 2 upgrades</li></ul><ul id="6d65eec0-a7b7-4ed2-926e-e1f47d52c769" class="bulleted-list"><li style="list-style-type:circle">They increase the number of bullets the player shoots and also increase the amount of hits that the player can take. </li></ul><ul id="29ab7dbb-8dbf-42a4-b70d-63081675e8d4" class="bulleted-list"><li style="list-style-type:circle">Each hit reduces the upgrades of the ship until explosion.</li></ul><figure id="be2e422e-7522-4853-afff-d018e77b1142" class="image" style="text-align:center"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%205.png"><img style="width:132px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%205.png"/></a><figcaption>The upgrade pickup</figcaption></figure></li></ul><p id="661875fd-756e-424c-acca-bc77cb9565fc" class="">
+</p><p id="41209122-a449-42d3-a67f-a2691909bce5" class="">There will be 4 types of enemies:</p><p id="7457b13b-3746-42d3-8287-ca047dc1caf3" class="">
+</p><ul id="20d7b47e-923b-4f46-b142-4cb39887b135" class="bulleted-list"><li style="list-style-type:disc">Wanderers: They just travel the screen in a zig-zag pattern from top to bottom.<figure id="ebfdfcaf-73a4-4109-892c-78de8676db4c" class="image" style="text-align:center"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%206.png"><img style="width:260.9375px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%206.png"/></a></figure></li></ul><p id="7899aa39-0130-4917-b927-ae5f9880df71" class="">
+</p><ul id="898a7f0c-2ffe-4b80-be26-4f3724d5a156" class="bulleted-list"><li style="list-style-type:disc">Snipers: They go past until your ship, then they go against the ship really fast to collide.<figure id="94dc6447-67c5-4f22-a81e-086b8b892e40" class="image" style="text-align:center"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%207.png"><img style="width:129px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%207.png"/></a></figure><p id="4413b6cd-9ff0-4afd-93fe-744f23c4412e" class="">
+</p></li></ul><ul id="f5da5b3f-7afc-4479-89a8-c7b18997544b" class="bulleted-list"><li style="list-style-type:disc">Shooters: They travel from top to bottom and to the sides shooting bullets to your ship.</li></ul><figure id="1ebc029f-2d2f-4e1b-b8aa-3e0ae0a668e6" class="image"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%208.png"><img style="width:263px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%208.png"/></a></figure><p id="f5b56eae-bab9-4b30-9013-8e2c321b6cb6" class="">
+</p><ul id="2f647312-8246-4a5a-8de0-c54557b64112" class="bulleted-list"><li style="list-style-type:disc">Blockers: Pair of bullet-immune enemies that travel from top to bottom creating a laser barrier between them. Only can be killed by dashing through them.</li></ul><figure id="71547088-ab1a-4032-b47a-e383043adeff" class="image"><a href="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%209.png"><img style="width:200.9976043701172px" src="Creating%20a%20PICO-8%20game%20eea0a658cbe94310a5fcac004dc44e0e/Untitled%209.png"/></a></figure><p id="1225196a-6981-4591-bf7d-76148b4265e0" class="">
+</p><p id="c5b85957-8026-44b3-ab35-9998025eeb71" class="">This is what I have so far… </p><p id="1a87c0d7-cd2b-4403-92bf-5b71cc410b81" class="">
+</p>
+<iframe src="./face_of_mars.html"></iframe>
+</div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
